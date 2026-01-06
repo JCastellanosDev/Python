@@ -6,6 +6,7 @@ class BankAccount:
         self.account_type = account_type
         self.pin = pin
         self.balance = balance
+
     def deposit(self, amount):
         self.balance += amount
         print("Deposited: $" + str(amount) + ". New balance: $" + str(self.balance))
@@ -19,6 +20,7 @@ class BankAccount:
                 print("Insufficient funds. Current balance: $" + str(self.balance))
         else:
             print("Incorrect PIN. Transaction denied.")
+            
     def display_balance(self, pin):
         if pin == self.pin:
             print("Current balance: $" + str(self.balance))
