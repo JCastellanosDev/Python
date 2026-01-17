@@ -56,7 +56,10 @@ fondo_img = pygame.transform.scale(fondo_img, fondo_tamaño)
 
 #Puntuacion
 score = 0 
-font = pygame.font.Font(None, 36)
+font = pygame.font.Font("star.TTF", 28)
+
+#variables 
+game_over = False
 
 #reloj para controlar FPS
 clock = pygame.time.Clock()
@@ -67,6 +70,14 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+            #RREINICIAR EL JUEGO
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE and game_over:
+            game_over = False
+            score = 0
+            meteroritos = []
+            jugador.x = ANCHO // 2 - jugador_ancho // 2
+            jugador.y = ALTO - jugador_alto - 10
+
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT] and jugador.left > 0:
         jugador.x -= 5
@@ -106,7 +117,15 @@ while running:
 
     #Mostrar Puntuacion 
     score_text = font.render(f"Puntuacion: {score}", True, blanco)
-    screen.blit(score_text, (10, 10)   )
+    screen.blit(score_text, (10, 10))
+
+    #Mostar mensaje de game over
+    if game_over:
+        game_over_text = font.render("Game Over", True, rojo)
+        restart_text = font.render("Presiona ESPACIO para reiniciar", True, blanco)
+        screen.blit(game_over_text, (ANCHO // 2 - game_over_text.get_width() // 2, ALTO // 2 - 50))
+        screen.blit(restart_text, (ANCHO // 2 - restart_text.get_width() // 2, ALTO // 2 + 10))
+
     #actualizar pantalla
     pygame.display.flip()
     #controlar frames
