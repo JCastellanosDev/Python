@@ -1,0 +1,3 @@
+([('BurgerVsChewbacca',
+   '/Users/jhcas/Desktop/phyton/enseñanza/Python/Juego/dist/BurgerVsChewbacca',
+   'EXECUTABLE')],)
