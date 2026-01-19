@@ -57,7 +57,7 @@ try:
     fondo_img = pygame.image.load(resource_path("estrellas.png")).convert()
     fondo_img = pygame.transform.scale(fondo_img, (ANCHO, ALTO))
     
-    print(" Imágenes cargadas")
+    print("✓ Imágenes cargadas")
 except Exception as e:
     print(f"Error cargando imágenes: {e}")
     print(f"Buscando en: {os.getcwd()}")
@@ -67,23 +67,23 @@ except Exception as e:
 
 try:
     # Asegurarse de que el mixer está inicializado
-    pygame.mixer. init()
+    pygame.mixer.init()
     
     # Cargar sonido de game over
-    sonido_game_over = pygame. mixer.Sound("game over.wav")  
+    sonido_game_over = pygame.mixer.Sound("game over.wav")  
     sonido_game_over.set_volume(0.7) 
     
-    print(" Sonidos cargados")
+    print("✓ Sonidos cargados")
 except Exception as e:
     print(f"⚠ Error cargando sonidos: {e}")
-    sonido_game_over = None  # Para evitar errores si no carga   
+    sonido_game_over = None
 
 # Cargar fuente
 try:
     font = pygame.font.Font(resource_path("star.TTF"), 28)
-    print(" Fuente cargada")
+    print("✓ Fuente cargada")
 except Exception as e:
-    print(f" Fuente no encontrada: {e}, usando fuente por defecto")
+    print(f"⚠ Fuente no encontrada: {e}, usando fuente por defecto")
     font = pygame.font.Font(None, 36)
 
 # HITBOXES
@@ -108,6 +108,7 @@ def reiniciar_juego():
         'score': 0,
         'game_over': False,
     }
+
 def dibujar_menu_principal(screen, font, opcion_seleccionada):
     """Dibuja el menú principal del juego"""
     # Fondo
@@ -121,11 +122,11 @@ def dibujar_menu_principal(screen, font, opcion_seleccionada):
     
     # Título del juego
     try:
-        titulo_font = pygame.font.Font("star. TTF", 60)
+        titulo_font = pygame.font.Font("retro?.otf", 60)
     except: 
-        titulo_font = pygame. font.Font(None, 60)
+        titulo_font = pygame.font.Font(None, 60)
     
-    titulo = titulo_font.render("CHUBAKAS BURGER", True, amarillo)
+    titulo = titulo_font.render("BURGER vs CHUBAKA", True, amarillo)
     screen.blit(titulo, (ANCHO // 2 - titulo.get_width() // 2, 100))
     
     # Subtítulo
@@ -149,7 +150,11 @@ def dibujar_menu_principal(screen, font, opcion_seleccionada):
         screen.blit(texto_renderizado, (ANCHO // 2 - texto_renderizado.get_width() // 2, y_pos))
     
     # Instrucciones de navegación
-    instrucciones_font = pygame.font.Font("star.TTF", 24)
+    try:
+        instrucciones_font = pygame.font.Font("retro?.otf", 24)
+    except:
+        instrucciones_font = pygame.font.Font(None, 24)
+    
     instrucciones = instrucciones_font.render("Usa ↑↓ para navegar, ENTER para seleccionar", True, (150, 150, 150))
     screen.blit(instrucciones, (ANCHO // 2 - instrucciones.get_width() // 2, ALTO - 50))
 
@@ -164,11 +169,11 @@ def dibujar_instrucciones(screen, font):
     screen.blit(overlay, (0, 0))
     
     # Título
-    titulo = font. render("INSTRUCCIONES", True, amarillo)
-    screen.blit(titulo, (ANCHO // 2 - titulo. get_width() // 2, 50))
+    titulo = font.render("INSTRUCCIONES", True, amarillo)
+    screen.blit(titulo, (ANCHO // 2 - titulo.get_width() // 2, 50))
     
     # Instrucciones
-    instrucciones_font = pygame.font.Font(None, 28)
+    instrucciones_font = pygame.font.Font("retro?.otf", 28)
     instrucciones = [
         "CONTROLES:",
         "",
@@ -204,7 +209,7 @@ def dibujar_instrucciones(screen, font):
 
 def dibujar_creditos(screen, font):
     """Dibuja la pantalla de créditos"""
-    screen. blit(fondo_img, (0, 0))
+    screen.blit(fondo_img, (0, 0))
     
     overlay = pygame.Surface((ANCHO, ALTO))
     overlay.set_alpha(200)
@@ -216,10 +221,10 @@ def dibujar_creditos(screen, font):
     screen.blit(titulo, (ANCHO // 2 - titulo.get_width() // 2, 100))
     
     # Créditos
-    creditos_font = pygame.font.Font(None, 30)
+    creditos_font = pygame.font.Font("retro?.otf", 30)
     creditos = [
         "",
-        "Desarrollado por:  JCastellanosDev",
+        "Desarrollado por: JCastellanosDev",
         "",
         "¡Gracias por jugar!"
     ]
@@ -258,156 +263,193 @@ while running:
             running = False
         
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE and juego['game_over']:
-                juego = reiniciar_juego()
-                imagenes_enemigo_cache.clear()
-                print("Juego reiniciado")
-            if event.key == pygame.K_h:
-                MOSTRAR_HITBOXES = not MOSTRAR_HITBOXES
-                print(f"Hitboxes: {'Visible' if MOSTRAR_HITBOXES else 'Oculto'}")
-
-    if not juego['game_over']:
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT] and juego['jugador'].left > 0:
-            juego['jugador'].x -= 7
-        if keys[pygame.K_RIGHT] and juego['jugador'].right < ANCHO:
-            juego['jugador'].x += 7
-        if keys[pygame.K_UP] and juego['jugador'].top > 0:
-            juego['jugador'].y -= 7
-        if keys[pygame.K_DOWN] and juego['jugador'].bottom < ALTO:
-            juego['jugador'].y += 7
-       
-
-        # ====== METEORITOS VERTICALES ALEATORIOS ======
-        if randint(1, 30) == 1:
-            pos_x = randint(0, ANCHO - 150)
-            velocidad_aleatoria = randint(3, 10)
-            tamaño_aleatorio = choice([ 90, 100, 120, 140, 160])
+            # NAVEGACIÓN DEL MENÚ
+            if estado_actual == MENU:
+                if event.key == pygame.K_UP:
+                    opcion_menu = (opcion_menu - 1) % 4
+                elif event.key == pygame.K_DOWN:
+                    opcion_menu = (opcion_menu + 1) % 4
+                elif event.key == pygame.K_RETURN:
+                    if opcion_menu == 0:  # JUGAR
+                        estado_actual = JUGANDO
+                        juego = reiniciar_juego()
+                        print("Iniciando juego...")
+                    elif opcion_menu == 1:  # INSTRUCCIONES
+                        estado_actual = INSTRUCCIONES
+                    elif opcion_menu == 2:  # CREDITOS
+                        estado_actual = CREDITOS
+                    elif opcion_menu == 3:  # SALIR
+                        running = False
             
-            nuevo = {
-                'rect': pygame.Rect(pos_x, -tamaño_aleatorio, tamaño_aleatorio, tamaño_aleatorio),
-                'velocidad': velocidad_aleatoria,
-                'tamaño': tamaño_aleatorio
-            }
+            # VOLVER AL MENÚ desde INSTRUCCIONES o CREDITOS
+            elif estado_actual == INSTRUCCIONES or estado_actual == CREDITOS:
+                if event.key == pygame.K_ESCAPE:
+                    estado_actual = MENU
             
-            juego['meteoritos_v'].append(nuevo)
+            # CONTROLES DEL JUEGO
+            elif estado_actual == JUGANDO:
+                if event.key == pygame.K_SPACE and juego['game_over']:
+                    estado_actual = MENU
+                    opcion_menu = 0
+                    print("Volviendo al menú...")
+                if event.key == pygame.K_h:
+                    MOSTRAR_HITBOXES = not MOSTRAR_HITBOXES
+                    print(f"Hitboxes: {'Visible' if MOSTRAR_HITBOXES else 'Oculto'}")
+                if event.key == pygame.K_ESCAPE:
+                    estado_actual = MENU
+                    opcion_menu = 0
 
-        # ====== METEORITOS HORIZONTALES ALEATORIOS ======
-        if juego['score'] >= PUNTUACION_HORIZONTALES and randint(1, 60) == 1:
-            desde_derecha = choice([True, False])
-            pos_y = randint(0, ALTO - 120)
-            velocidad_aleatoria = randint(3, 9)
-            tamaño_aleatorio = choice([ 90, 100, 110, 130])
-            
-            if desde_derecha:
-                nuevo_h = {
-                    'rect': pygame.Rect(ANCHO, pos_y, tamaño_aleatorio, tamaño_aleatorio),
-                    'direccion': -1,
-                    'velocidad': velocidad_aleatoria,
-                    'tamaño': tamaño_aleatorio
-                }
-            else:
-                nuevo_h = {
-                    'rect': pygame.Rect(-tamaño_aleatorio, pos_y, tamaño_aleatorio, tamaño_aleatorio),
-                    'direccion': 1,
-                    'velocidad': velocidad_aleatoria,
-                    'tamaño': tamaño_aleatorio
-                }
-            
-            juego['meteoritos_h'].append(nuevo_h)
+    # RENDERIZADO SEGÚN ESTADO
+    if estado_actual == MENU:
+        dibujar_menu_principal(screen, font, opcion_menu)
+    
+    elif estado_actual == INSTRUCCIONES:
+        dibujar_instrucciones(screen, font)
+    
+    elif estado_actual == CREDITOS:
+        dibujar_creditos(screen, font)
+    
+    elif estado_actual == JUGANDO:
+        if not juego['game_over']:
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_LEFT] and juego['jugador'].left > 0:
+                juego['jugador'].x -= 7
+            if keys[pygame.K_RIGHT] and juego['jugador'].right < ANCHO:
+                juego['jugador'].x += 7
+            if keys[pygame.K_UP] and juego['jugador'].top > 0:
+                juego['jugador'].y -= 7
+            if keys[pygame.K_DOWN] and juego['jugador'].bottom < ALTO:
+                juego['jugador'].y += 7
 
-        jugador_hitbox = get_hitbox(juego['jugador'], JUGADOR_HITBOX_REDUCCION)
-
-        # Actualizar meteoritos verticales
-        meteoritos_v_temp = []
-        for meteor in juego['meteoritos_v']:
-            meteor['rect'].y += meteor['velocidad']
-            
-            if meteor['rect'].top > ALTO:
-                juego['score'] += 1
-            else:
-                meteoritos_v_temp.append(meteor)
+            # METEORITOS VERTICALES
+            if randint(1, 30) == 1:
+                pos_x = randint(0, ANCHO - 150)
+                velocidad_aleatoria = randint(3, 10)
+                tamaño_aleatorio = choice([90, 100, 120, 140, 160])
                 
-            meteor_hitbox = get_hitbox(meteor['rect'], ENEMIGO_HITBOX_REDUCCION)
-            if jugador_hitbox.colliderect(meteor_hitbox):
-                if sonido_game_over: 
-                    sonido_game_over.play()
+                nuevo = {
+                    'rect': pygame.Rect(pos_x, -tamaño_aleatorio, tamaño_aleatorio, tamaño_aleatorio),
+                    'velocidad': velocidad_aleatoria,
+                    'tamaño': tamaño_aleatorio
+                }
+                
+                juego['meteoritos_v'].append(nuevo)
+
+            # METEORITOS HORIZONTALES
+            if juego['score'] >= PUNTUACION_HORIZONTALES and randint(1, 60) == 1:
+                desde_derecha = choice([True, False])
+                pos_y = randint(0, ALTO - 120)
+                velocidad_aleatoria = randint(3, 9)
+                tamaño_aleatorio = choice([90, 100, 110, 130])
+                
+                if desde_derecha:
+                    nuevo_h = {
+                        'rect': pygame.Rect(ANCHO, pos_y, tamaño_aleatorio, tamaño_aleatorio),
+                        'direccion': -1,
+                        'velocidad': velocidad_aleatoria,
+                        'tamaño': tamaño_aleatorio
+                    }
+                else:
+                    nuevo_h = {
+                        'rect': pygame.Rect(-tamaño_aleatorio, pos_y, tamaño_aleatorio, tamaño_aleatorio),
+                        'direccion': 1,
+                        'velocidad': velocidad_aleatoria,
+                        'tamaño': tamaño_aleatorio
+                    }
+                
+                juego['meteoritos_h'].append(nuevo_h)
+
+            jugador_hitbox = get_hitbox(juego['jugador'], JUGADOR_HITBOX_REDUCCION)
+
+            # Actualizar meteoritos verticales
+            meteoritos_v_temp = []
+            for meteor in juego['meteoritos_v']:
+                meteor['rect'].y += meteor['velocidad']
+                
+                if meteor['rect'].top > ALTO:
+                    juego['score'] += 1
+                else:
+                    meteoritos_v_temp.append(meteor)
+                    
+                meteor_hitbox = get_hitbox(meteor['rect'], ENEMIGO_HITBOX_REDUCCION)
+                if jugador_hitbox.colliderect(meteor_hitbox):
+                    if sonido_game_over: 
+                        sonido_game_over.play()
                     print(f"¡Colisión vertical! Score: {juego['score']}")
                     juego['game_over'] = True
-        
-        juego['meteoritos_v'] = meteoritos_v_temp
-
-        # Actualizar meteoritos horizontales
-        meteoritos_h_temp = []
-        for meteor_h in juego['meteoritos_h']:
-            meteor_h['rect'].x += meteor_h['velocidad'] * meteor_h['direccion']
             
-            if meteor_h['rect'].right < 0 or meteor_h['rect'].left > ANCHO:
-                juego['score'] += 1
-            else:
-                meteoritos_h_temp.append(meteor_h)
-                
-            meteor_h_hitbox = get_hitbox(meteor_h['rect'], ENEMIGO_HITBOX_REDUCCION)
-            if jugador_hitbox.colliderect(meteor_h_hitbox):
-                if sonido_game_over: 
-                    sonido_game_over.play()
-                    print(f"¡Colisión horizontal! Score: {juego['score']}")
-                juego['game_over'] = True
-        
-        juego['meteoritos_h'] = meteoritos_h_temp
+            juego['meteoritos_v'] = meteoritos_v_temp
 
-    # DIBUJAR TODO
-    screen.blit(fondo_img, (0, 0))
-    screen.blit(jugador_image, juego['jugador'])
-    
-    # Dibujar meteoritos verticales
-    for meteor in juego['meteoritos_v']:
-        enemigo_img = get_enemigo_image(meteor['tamaño'])
-        screen.blit(enemigo_img, meteor['rect'])
-    
-    # Dibujar meteoritos horizontales
-    for meteor_h in juego['meteoritos_h']:
-        enemigo_img = get_enemigo_image(meteor_h['tamaño'])
-        screen.blit(enemigo_img, meteor_h['rect'])
-    
-    # Mostrar hitboxes (debug)
-    if MOSTRAR_HITBOXES:
-        jugador_hitbox = get_hitbox(juego['jugador'], JUGADOR_HITBOX_REDUCCION)
-        pygame.draw.rect(screen, verde, jugador_hitbox, 2)
+            # Actualizar meteoritos horizontales
+            meteoritos_h_temp = []
+            for meteor_h in juego['meteoritos_h']:
+                meteor_h['rect'].x += meteor_h['velocidad'] * meteor_h['direccion']
+                
+                if meteor_h['rect'].right < 0 or meteor_h['rect'].left > ANCHO:
+                    juego['score'] += 1
+                else:
+                    meteoritos_h_temp.append(meteor_h)
+                    
+                meteor_h_hitbox = get_hitbox(meteor_h['rect'], ENEMIGO_HITBOX_REDUCCION)
+                if jugador_hitbox.colliderect(meteor_h_hitbox):
+                    if sonido_game_over: 
+                        sonido_game_over.play()
+                    print(f"¡Colisión horizontal! Score: {juego['score']}")
+                    juego['game_over'] = True
+            
+            juego['meteoritos_h'] = meteoritos_h_temp
+
+        # DIBUJAR JUEGO
+        screen.blit(fondo_img, (0, 0))
+        screen.blit(jugador_image, juego['jugador'])
         
+        # Dibujar meteoritos
         for meteor in juego['meteoritos_v']:
-            meteor_hitbox = get_hitbox(meteor['rect'], ENEMIGO_HITBOX_REDUCCION)
-            pygame.draw.rect(screen, rojo, meteor_hitbox, 2)
+            enemigo_img = get_enemigo_image(meteor['tamaño'])
+            screen.blit(enemigo_img, meteor['rect'])
         
         for meteor_h in juego['meteoritos_h']:
-            meteor_h_hitbox = get_hitbox(meteor_h['rect'], ENEMIGO_HITBOX_REDUCCION)
-            pygame.draw.rect(screen, rojo, meteor_h_hitbox, 2)
-    
-    # Puntuación
-    score_text = font.render(f"Puntuacion: {juego['score']}", True, blanco)
-    screen.blit(score_text, (10, 10))
-    
-    # Advertencia meteoritos horizontales
-    if (juego['score'] >= PUNTUACION_HORIZONTALES and 
-        juego['score'] < PUNTUACION_HORIZONTALES + 3 and 
-        not juego['game_over']):
-        warning = font.render("¡METEORITOS LATERALES!", True, amarillo)
-        screen.blit(warning, (ANCHO // 2 - warning.get_width() // 2, 50))
-    
-    # Game Over
-    if juego['game_over']:
-        overlay = pygame.Surface((ANCHO, ALTO))
-        overlay.set_alpha(128)
-        overlay.fill(negro)
-        screen.blit(overlay, (0, 0))
+            enemigo_img = get_enemigo_image(meteor_h['tamaño'])
+            screen.blit(enemigo_img, meteor_h['rect'])
         
-        texto_go = font.render("GAME OVER", True, rojo)
-        texto_score = font.render(f"Puntuacion: {juego['score']}", True, verde)
-        texto_restart = font.render("Presiona ESPACIO", True, blanco)
+        # Hitboxes (debug)
+        if MOSTRAR_HITBOXES:
+            jugador_hitbox = get_hitbox(juego['jugador'], JUGADOR_HITBOX_REDUCCION)
+            pygame.draw.rect(screen, verde, jugador_hitbox, 2)
+            
+            for meteor in juego['meteoritos_v']:
+                meteor_hitbox = get_hitbox(meteor['rect'], ENEMIGO_HITBOX_REDUCCION)
+                pygame.draw.rect(screen, rojo, meteor_hitbox, 2)
+            
+            for meteor_h in juego['meteoritos_h']:
+                meteor_h_hitbox = get_hitbox(meteor_h['rect'], ENEMIGO_HITBOX_REDUCCION)
+                pygame.draw.rect(screen, rojo, meteor_h_hitbox, 2)
         
-        screen.blit(texto_go, (ANCHO // 2 - texto_go.get_width() // 2, ALTO // 2 - 80))
-        screen.blit(texto_score, (ANCHO // 2 - texto_score.get_width() // 2, ALTO // 2 - 20))
-        screen.blit(texto_restart, (ANCHO // 2 - texto_restart.get_width() // 2, ALTO // 2 + 40))
+        # Puntuación
+        score_text = font.render(f"Puntuacion: {juego['score']}", True, blanco)
+        screen.blit(score_text, (10, 10))
+        
+        # Advertencia meteoritos horizontales
+        if (juego['score'] >= PUNTUACION_HORIZONTALES and 
+            juego['score'] < PUNTUACION_HORIZONTALES + 3 and 
+            not juego['game_over']):
+            warning = font.render("¡METEORITOS LATERALES!", True, amarillo)
+            screen.blit(warning, (ANCHO // 2 - warning.get_width() // 2, 50))
+        
+        # Game Over
+        if juego['game_over']:
+            overlay = pygame.Surface((ANCHO, ALTO))
+            overlay.set_alpha(128)
+            overlay.fill(negro)
+            screen.blit(overlay, (0, 0))
+            
+            texto_go = font.render("GAME OVER", True, rojo)
+            texto_score = font.render(f"Puntuacion: {juego['score']}", True, verde)
+            texto_restart = font.render("Presiona ESPACIO para volver al menu", True, blanco)
+            
+            screen.blit(texto_go, (ANCHO // 2 - texto_go.get_width() // 2, ALTO // 2 - 80))
+            screen.blit(texto_score, (ANCHO // 2 - texto_score.get_width() // 2, ALTO // 2 - 20))
+            screen.blit(texto_restart, (ANCHO // 2 - texto_restart.get_width() // 2, ALTO // 2 + 40))
     
     pygame.display.flip()
     clock.tick(60)
