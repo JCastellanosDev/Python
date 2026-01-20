@@ -1,1 +1,1 @@
-para entrar al bot https://discord.gg/wfAayccm
+Solo estoy aprendiendo ptython poco a poco, aqui humildemente
